@@ -40,3 +40,20 @@
 - `src/middleware/whiteboardAccess.js` — `requireBoardAccess`: verifies owner/member, attaches `req.board`; `requireEditAccess`: blocks viewer-role from mutations
 - `src/middleware/upload.js` — multer middleware (`uploadImage`): memory storage, image-only filter, 8 MB limit
 - `src/realtime/index.js` — thin wrapper: `setIo`, `emitToBoard`, `boardRoom` — keeps Socket.IO instance decoupled from controllers
+
+## Routes
+
+- `src/routes/index.js` — root `/api` router; mounts `/healthcheck`, `/users`, `/whiteboards`
+- `src/routes/userRoutes.js` — `GET /users/search` (protected)
+- `src/routes/whiteboardRoutes.js` — full board CRUD + member management + element CRUD (all protected by `requireAuth`):
+  - `GET /whiteboards` — list boards
+  - `POST /whiteboards` — create board
+  - `GET /whiteboards/:boardId` — get board + elements + members
+  - `PATCH /whiteboards/:boardId` — update board metadata
+  - `DELETE /whiteboards/:boardId` — delete board
+  - `POST /whiteboards/:boardId/members` — add member
+  - `DELETE /whiteboards/:boardId/members/:userId` — remove member
+  - `POST /whiteboards/:boardId/elements` — create element
+  - `POST /whiteboards/:boardId/elements/bulk` — bulk create elements
+  - `PATCH /whiteboards/:boardId/elements/:elementId` — update element
+  - `DELETE /whiteboards/:boardId/elements/:elementId` — delete element (cleans up image uploads)
