@@ -57,3 +57,10 @@
   - `POST /whiteboards/:boardId/elements/bulk` — bulk create elements
   - `PATCH /whiteboards/:boardId/elements/:elementId` — update element
   - `DELETE /whiteboards/:boardId/elements/:elementId` — delete element (cleans up image uploads)
+
+## Controllers
+
+- `src/controllers/userController.js` — `searchUsers`: ILIKE search by name/email
+- `src/controllers/whiteboardController.js` — `listBoards`, `createBoard`, `getBoard`, `updateBoard`, `deleteBoard`, `addMember`, `removeMember`
+- `src/controllers/elementController.js` — `createElement`, `bulkCreate`, `updateElement`, `deleteElement`; calls `deleteUploadByUrl` on image element deletion
+- `src/controllers/uploadController.js` — `uploadImage`: accepts multipart upload, stores to Neon Object Storage if configured, else saves to local `uploads/`; returns `{ url, filename, size }`
