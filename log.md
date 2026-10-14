@@ -64,3 +64,12 @@
 - `src/controllers/whiteboardController.js` — `listBoards`, `createBoard`, `getBoard`, `updateBoard`, `deleteBoard`, `addMember`, `removeMember`
 - `src/controllers/elementController.js` — `createElement`, `bulkCreate`, `updateElement`, `deleteElement`; calls `deleteUploadByUrl` on image element deletion
 - `src/controllers/uploadController.js` — `uploadImage`: accepts multipart upload, stores to Neon Object Storage if configured, else saves to local `uploads/`; returns `{ url, filename, size }`
+- `src/controllers/aiController.js` — AI-powered board actions (all persist elements via shared `persistElements` helper, emit `element:created`):
+  - `brainstorm` — generates sticky notes from a topic via Gemini
+  - `outline` — generates a titled bullet-point outline
+  - `diagram` — generates a flowchart (nodes + arrows) with topology-aware layout
+  - `chart` — generates a bar/line/pie/donut chart element
+  - `editSelection` — rewrites text/bullet/chart content for selected elements
+  - `summary` — summarizes all text on the board (headline, themes, action items, open questions)
+
+## AI Service
