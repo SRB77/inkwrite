@@ -73,3 +73,10 @@
   - `summary` — summarizes all text on the board (headline, themes, action items, open questions)
 
 ## AI Service
+
+- `src/services/aiService.js` — Gemini (`gemini-2.0-flash` default) wrapper:
+  - `runPrompt` — calls Gemini API, maps 429/401/403 to typed `ApiError`
+  - `extractJson` — strips fenced code blocks, parses first JSON object/array from response
+  - Exports: `brainstormNotes`, `generateOutline`, `generateDiagram`, `generateChart`, `editElements`, `editChart`, `summarizeBoard`
+
+## Socket.IO
