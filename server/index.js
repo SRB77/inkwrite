@@ -1,23 +1,42 @@
+require('dotenv').config();
+const http = require('http');
 const express = require("express");
 const cors = require("cors");
-const path = require("path");
-require("dotenv").config();
 
-const routes = require("./src/routes");
-const { errorHandler, notFound } = require("./src/middleware/errorHandler");
+const { errorHandler, notFoundHandler } = require("./src/middleware/errorHandler");
+const apiRoutes = require("./src/routes");
+const {initSocket} = require('./src/socket');
+const {UPLOAD_DIR} = require("./src/config/uploads");
 
 const app = express();
-const PORT = process.env.PORT || 5050;
 
-app.use(cors({ origin: process.env.CLIENT_URL || "http://localhost:5173", credentials: true }));
+
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    credentials: true,
+  })
+);
+
 app.use(express.json({ limit: "5mb" }));
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-app.use("/api", routes);
+app.use("/uploads", express.static(UPLOAD_DIR,  {maxAge: "30d", immutable: true}));
 
-app.use(notFound);
+app.get("/", (_req, res) =>
+  res.json({ name: "AI Whiteboard Notes API", status: "running" })
+);
+
+app.use("/api",apiRoutes); //this is for routing . 
+app.use(notFoundHandler);
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+const server = http.createServer(app);
+initSocket(server);
+
+const PORT = process.env.PORT || 5050;
+server.listen(PORT, () => {
+  console.log(`API + Socket.IO listening on http://localhost:${PORT}`);
 });
+
+
+module.exports = app;
