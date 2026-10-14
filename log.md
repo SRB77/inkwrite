@@ -80,3 +80,12 @@
   - Exports: `brainstormNotes`, `generateOutline`, `generateDiagram`, `generateChart`, `editElements`, `editChart`, `summarizeBoard`
 
 ## Socket.IO
+
+- `src/socket/index.js` — `initSocket(httpServer)`: creates `Server`, token auth middleware via `resolveUserFromToken`, handles per-connection events:
+  - `wb:join` — joins board room, broadcasts `presence:join`, emits `presence:sync` back
+  - `wb:leave` — leaves room, broadcasts `presence:leave`
+  - `presence:cursor` — forwards cursor `{x, y}` to room
+  - `element:live` — forwards in-flight element state to room (no DB write)
+  - `disconnecting` — broadcasts `presence:leave` to all joined rooms
+
+---
