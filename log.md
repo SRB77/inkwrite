@@ -89,3 +89,29 @@
   - `disconnecting` — broadcasts `presence:leave` to all joined rooms
 
 ---
+
+## Frontend Setup
+
+### Stack
+- React 19 + Vite 8, ESM project (`"type": "module"`)
+- Tailwind CSS v4 via `@tailwindcss/vite` plugin (no `tailwind.config.js` needed)
+- Linter: `oxlint`
+
+### Key Dependencies
+| Package | Purpose |
+|---|---|
+| `@neondatabase/auth-ui` + `@neondatabase/neon-js` | Neon Auth UI + SDK |
+| `react-router-dom` v7 | Client-side routing |
+| `axios` | HTTP client for API calls |
+| `socket.io-client` | Real-time connection to backend |
+| `framer-motion` | Animations |
+| `lucide-react` | Icon set |
+| `react-hot-toast` | Toast notifications |
+| `perfect-freehand` | Smooth freehand drawing stroke generation |
+
+### Environment (`.env`)
+- `VITE_API_URL` — backend REST API base (`http://localhost:5050/api`)
+- `VITE_SOCKET_URL` — Socket.IO server (`http://localhost:5050`)
+- `VITE_NEON_AUTH_URL` — Neon Auth endpoint (same as backend `NEON_AUTH_URL`)
+
+---
