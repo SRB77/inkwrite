@@ -115,3 +115,55 @@
 - `VITE_NEON_AUTH_URL` — Neon Auth endpoint (same as backend `NEON_AUTH_URL`)
 
 ---
+
+## Frontend — Routing & Auth
+
+### `src/App.jsx`
+- `BrowserRouter` with `AuthProvider` and `NeonAuthGate` wrapping all routes
+- Auth mode is runtime-switched: if `VITE_NEON_AUTH_URL` is set → Neon Auth routes (`/auth/:pathname`); else → custom `/login` and `/register`
+- Routes: `/` (Landing), `/login`, `/register`, `/auth/:pathname`, `/dashboard`, `/board/:boardId`, `/404`
+- `ProtectedRoute` redirects unauthenticated users to `/login`; `PublicOnlyRoute` redirects logged-in users to `/dashboard`
+
+### `src/context/AuthContext.jsx`
+- Two providers in one file — `NeonAuthProvider` (Neon Auth SDK session) and `LocalAuthProvider` (JWT in localStorage) — selected at module load based on `neonEnabled`
+- Both expose `{ user, loading, login, register, logout }` via `useAuth()`
+- Neon mode: refreshes token on mount + every 10 min, connects Socket.IO on user change
+- Local mode: reads token from localStorage on mount, calls `/auth/me` to restore session
+
+### `src/components/NeonAuthGate.jsx`
+- Wraps app in `NeonAuthUIProvider` when Neon Auth is enabled (no-op wrapper otherwise)
+- `NeonAuthPage` renders `<AuthView>` for all Neon auth screens (`/auth/sign-in`, `/auth/sign-up`, `/auth/sign-out`, etc.)
+
+### `src/routes/ProtectedRoute.jsx`
+- `ProtectedRoute` — shows `FullScreenSpinner` while loading, redirects to `/login` with `state.from` if unauthenticated
+- `PublicOnlyRoute` — redirects authenticated users to `/dashboard`
+
+---
+
+## Frontend — API & Socket Layer
+
+### `src/lib/api.js`
+- Axios instance pointed at `VITE_API_URL`
+- Request interceptor: attaches `Authorization: Bearer <token>` and `x-socket-id` header on every request
+- Response interceptor: on 401 with Neon mode → auto-refreshes token and retries once; on 401 local mode → clears token and redirects to `/login`; normalises error messages
+- Exports typed API groups:
+  - `authApi` — `register`, `login`, `me`
+  - `userApi` — `search`
+  - `boardApi` — `list`, `create`, `get`, `update`, `remove`, `addMember`, `removeMember`
+  - `uploadApi` — `image(boardId, blob, filename)`
+  - `elementApi` — `create`, `bulkCreate`, `update`, `remove`
+  - `aiApi` — `brainstorm`, `outline`, `diagram`, `chart`, `edit`, `summary`
+
+### `src/lib/socket.js`
+- Lazy singleton: creates `io` instance on first `getSocket()` call with `autoConnect: false`
+- `connectSocket()` — refreshes Neon token if needed, sets auth token, connects
+- `disconnectSocket()` — disconnects if connected
+- `getSocketId()` — returns socket id for the `x-socket-id` header
+
+### `src/lib/neonAuth.js`
+- Neon Auth SDK wrapper: `createClient` with `BetterAuthReactAdapter`
+- `refreshNeonToken()` — tries `authClient.token()` then falls back to `getSession()`, caches result
+- `asTokenString()` — normalises various token shapes the SDK might return
+- Exports: `neonEnabled`, `authClient`, `getNeonToken`, `clearNeonToken`, `neonSignIn`, `neonSignUp`, `neonSignOut`
+
+---
