@@ -1,0 +1,37 @@
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { NeonAuthUIProvider, AuthView } from "@neondatabase/auth-ui";
+import { authClient, neonEnabled } from "../lib/neonAuth";
+import AuthLayout from "./AuthLayout";
+
+// Module-level so its identity is stable across renders.
+const RouterLink = ({ href, ...props }) => <Link to={href} {...props} />;
+
+function Inner({ children }) {
+  const navigate = useNavigate();
+  return (
+    <NeonAuthUIProvider
+      authClient={authClient}
+      redirectTo="/dashboard"
+      basePath="/auth"
+      defaultTheme="light"
+      navigate={(href) => navigate(href)}
+      replace={(href) => navigate(href, { replace: true })}
+      Link={RouterLink}
+    >
+      {children}
+    </NeonAuthUIProvider>
+  );
+}
+
+export default function NeonAuthGate({ children }) {
+  return neonEnabled ? <Inner>{children}</Inner> : children;
+}
+
+export function NeonAuthPage() {
+  const { pathname } = useParams();
+  return (
+    <AuthLayout wide>
+      <AuthView path={pathname} />
+    </AuthLayout>
+  );
+}
