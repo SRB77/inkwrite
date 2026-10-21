@@ -139,3 +139,62 @@
 - `PublicOnlyRoute` — redirects authenticated users to `/dashboard`
 
 ---
+
+## Frontend — API & Socket Layer
+
+### `src/lib/api.js`
+- Axios instance pointed at `VITE_API_URL`
+- Request interceptor: attaches `Authorization: Bearer <token>` and `x-socket-id` header on every request
+- Response interceptor: on 401 with Neon mode → auto-refreshes token and retries once; on 401 local mode → clears token and redirects to `/login`; normalises error messages
+- Exports typed API groups:
+  - `authApi` — `register`, `login`, `me`
+  - `userApi` — `search`
+  - `boardApi` — `list`, `create`, `get`, `update`, `remove`, `addMember`, `removeMember`
+  - `uploadApi` — `image(boardId, blob, filename)`
+  - `elementApi` — `create`, `bulkCreate`, `update`, `remove`
+  - `aiApi` — `brainstorm`, `outline`, `diagram`, `chart`, `edit`, `summary`
+
+### `src/lib/socket.js`
+- Lazy singleton: creates `io` instance on first `getSocket()` call with `autoConnect: false`
+- `connectSocket()` — refreshes Neon token if needed, sets auth token, connects
+- `disconnectSocket()` — disconnects if connected
+- `getSocketId()` — returns socket id for the `x-socket-id` header
+
+### `src/lib/neonAuth.js`
+- Neon Auth SDK wrapper: `createClient` with `BetterAuthReactAdapter`
+- `refreshNeonToken()` — tries `authClient.token()` then falls back to `getSession()`, caches result
+- `asTokenString()` — normalises various token shapes the SDK might return
+- Exports: `neonEnabled`, `authClient`, `getNeonToken`, `clearNeonToken`, `neonSignIn`, `neonSignUp`, `neonSignOut`
+
+---
+
+## Frontend — Canvas Engine (`src/lib/`)
+
+### `src/lib/canvas.js`
+- Tool constants: `select`, `pan`, `text`, `sticky`, `rect`, `ellipse`, `diamond`, `line`, `arrow`, `draw`, `bullet`, `hand`, `eraser`
+- Camera: `worldToScreen`, `screenToWorld`
+- Freehand: `strokeToPath` — converts `perfect-freehand` output to SVG path string
+- Geometry: `getBounds`, `unionBounds`, `translateData`, `resizeData`, `hitTest`, `boundsIntersectRect`, `diamondPoints`, `arrowHead`
+- Style palettes: `STROKE_COLORS`, `FILL_COLORS`, `STICKY_COLORS`, `STROKE_WIDTHS`, `FONT_SIZES`
+
+### `src/lib/sketch.js`
+- Deterministic "hand-drawn" look using seeded random (FNV-1a hash + mulberry32 PRNG) — same element id always produces identical wobble
+- Exports: `seededRandom`, `sketchLine`, `sketchPolygon`, `sketchRect`, `sketchEllipse`
+
+### `src/lib/exportCanvas.js`
+- `buildSvgString(elements, opts)` — renders all elements to a self-contained SVG string
+- `exportSVG` / `exportPNG` — downloads the board as `.svg` or `.png` (PNG via canvas, capped at 8192 px)
+- `inlineImages` — fetches remote image URLs and embeds them as data URIs before export
+- `textSvg`, `elementSvg` — per-element SVG serializers (no foreignObject, renders cleanly outside a browser)
+
+### `src/lib/image.js`
+- `fileToDownscaledBlob(file, maxDim=1600)` — downscales large images before upload; preserves PNG transparency, converts everything else to JPEG
+- `urlToDataURL(url)` — fetches a remote URL and returns a base64 data URI
+
+### `src/lib/utils.js`
+- `cn(...args)` — simple class name joiner
+- `initials(name)` — extracts 1–2 letter initials
+- `colorFromId(id)` — deterministic colour from a UUID (for avatars)
+- `relativeTime(date)` — human-friendly relative timestamp
+
+---
