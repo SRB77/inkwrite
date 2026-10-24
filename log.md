@@ -198,3 +198,46 @@
 - `relativeTime(date)` — human-friendly relative timestamp
 
 ---
+
+## Frontend — Components
+
+### `src/components/board/Canvas.jsx`
+Full interactive SVG canvas — the core of the whiteboard editor:
+- Pointer handling: pan (middle button / space), move, marquee select, resize (8 handles), rotate, endpoint drag for lines, eraser
+- Drawing: freehand (uses `perfect-freehand`), box/line drafts shown live before commit
+- Keyboard: spacebar-pan
+- Inline editing: `EditingOverlay` positioned over the SVG for text/sticky/bullet/shape labels
+- Cursor throttle for live presence (45 ms)
+- Rotation support on all non-line elements
+- Prop contract: `persist.create`, `persist.update`, `persist.remove` for server writes; `emitLive` for in-flight socket updates; `emitCursor` for presence
+
+### `src/components/board/ElementRenderer.jsx`
+SVG renderer for all 12 element types: `rect`, `ellipse`, `diamond`, `line`, `arrow`, `draw`, `sticky`, `text`, `bullet`, `chart`, `image`, `emoji`; supports `sketch` mode (wobbly edges) on shapes via `seededRandom`
+
+### `src/components/board/AIPanel.jsx`
+Slide-in panel (framer-motion spring animation) with:
+- Prompt textarea
+- If elements are selected → "Edit N selected" button
+- Items count slider (3–12)
+- 2×2 grid of create buttons: Sticky notes, Outline, Flow diagram, Chart
+- "Summarize this board" with collapsible result (headline, themes, action items, open questions)
+
+### `src/components/board/ShareModal.jsx`
+Member management modal: invite by email + role (editor/viewer), list current members sorted owner-first, remove members; owner-only controls; uses `Avatar` component
+
+### `src/components/board/ChartElement.jsx` / `ChartEditor.jsx`
+Chart rendering and in-place editing (file present, content not read yet)
+
+### `src/components/board/EditingOverlay.jsx`
+Positioned HTML overlay for inline text editing (file present, content not read yet)
+
+### `src/components/BoardThumbnail.jsx`
+Lazy-loaded SVG thumbnail for the dashboard board cards: intersection-observer triggers a `boardApi.get()` fetch; result cached by `boardId:updatedAt` key; renders via `ElementRenderer`
+
+### `src/components/AuthLayout.jsx`
+Two-column auth layout: branded left panel (desktop only) + centered form on the right; used by Login, Register, and `NeonAuthPage`
+
+### `src/components/UserMenu.jsx` / `ui/` primitives
+`UserMenu` — avatar + dropdown (file present). UI primitives: `Button`, `Input`/`Select`/`Textarea`, `Modal`, `Avatar`, `Spinner` / `FullScreenSpinner`
+
+---
