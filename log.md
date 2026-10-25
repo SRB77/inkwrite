@@ -241,3 +241,16 @@ Two-column auth layout: branded left panel (desktop only) + centered form on the
 `UserMenu` — avatar + dropdown (file present). UI primitives: `Button`, `Input`/`Select`/`Textarea`, `Modal`, `Avatar`, `Spinner` / `FullScreenSpinner`
 
 ---
+
+## Frontend — Pages
+
+| Page | Status | Notes |
+|---|---|---|
+| `Landing.jsx` | ✅ Done | Hero, features grid, how-it-works, stats, testimonials, CTA |
+| `Login.jsx` | ✅ Done | Email/password form via `AuthLayout`; redirects to `state.from` after login |
+| `Register.jsx` | ✅ Done (not read) | Mirrors Login |
+| `Dashboard.jsx` | ✅ Done | Board grid with `BoardThumbnail`, `CreateBoardModal`, delete with confirm |
+| `NotFound.jsx` | ✅ Done (not read) | 404 page |
+| `WhiteboardPage.jsx` | 🚧 Stub | Returns `<div>Whiteboard</div>` — Canvas, AIPanel, ShareModal, toolbar not wired up yet |
+
+---
