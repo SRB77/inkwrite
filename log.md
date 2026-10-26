@@ -254,3 +254,22 @@ Two-column auth layout: branded left panel (desktop only) + centered form on the
 | `WhiteboardPage.jsx` | 🚧 Stub | Returns `<div>Whiteboard</div>` — Canvas, AIPanel, ShareModal, toolbar not wired up yet |
 
 ---
+
+## Frontend — Current State & What's Left
+
+**Done:**
+- Full routing + auth (both Neon and local JWT modes)
+- Complete API client with auto token refresh and retry
+- Socket.IO client singleton wired to auth lifecycle
+- Full canvas engine (geometry, tools, sketch, export)
+- All 12 element types render correctly
+- AI panel, share modal, dashboard, landing page fully built
+- Export to SVG + PNG
+
+**Remaining:**
+- `WhiteboardPage.jsx` needs to be built — wire up Canvas + AIPanel + ShareModal + toolbar + Socket.IO presence + undo/redo
+- `ChartElement.jsx` and `ChartEditor.jsx` not yet reviewed
+- `EditingOverlay.jsx` not yet reviewed
+- `UserMenu.jsx` not yet reviewed
+
+---
