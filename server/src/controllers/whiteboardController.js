@@ -34,11 +34,12 @@ const createBoard = asyncHandler(async (req, res) => {
   const bg_color = HEX_RE.test(req.body.bg_color || "")
     ? req.body.bg_color
     : "#ffffff";
-  `INSERT INTO whiteboards (title, description, background, bg_color, owner_id)
+  const { rows } = await query(
+    `INSERT INTO whiteboards (title, description, background, bg_color, owner_id)
 VALUES ($1, $2, $3, $4, $5)
-RETURNING *`;
-  [title, description, background, bg_color, req.user.id];
-  const { rows } = await query();
+RETURNING *`,
+    [title, description, background, bg_color, req.user.id],
+  );
   res.status(201).json({ board: rows[0] });
 });
 
