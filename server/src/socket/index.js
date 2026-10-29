@@ -91,7 +91,6 @@ const initSocket = (httpServer) => {
       .emit("element:live", { element, by: user.id });
   });
 
-  });
   socket.on("disconnecting", () => {
     for (const room of socket.rooms) {
       if (room === socket.id) continue;
@@ -99,7 +98,8 @@ const initSocket = (httpServer) => {
         user: { id: user.id, name: user.name },
       });
     }
-  }); // end io.on("connection")
+  });
+}); // end io.on("connection")
   setIo(io);
   return io; 
 };
