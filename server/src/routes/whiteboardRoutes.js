@@ -15,7 +15,7 @@ const router = express.Router();
 router.use(requireAuth);
 
 router.get("/", board.listBoards);
-router.get("/", board.createBoard);
+router.post("/", board.createBoard);
 
 router.get(":boardId", requireBoardAccess, board.getBoard);
 router.patch(
