@@ -17,7 +17,7 @@ router.use(requireAuth);
 router.get("/", board.listBoards);
 router.post("/", board.createBoard);
 
-router.get(":boardId", requireBoardAccess, board.getBoard);
+router.get("/:boardId", requireBoardAccess, board.getBoard);
 router.patch(
   "/:boardId",
   requireBoardAccess,
