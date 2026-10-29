@@ -1,4 +1,4 @@
-const { server } = require("socket.io");
+const { Server } = require("socket.io");
 const { resolveUserFromToken } = require("../utils/resolveUser");
 const { query } = require("../config/db");
 const { setIo, boardRoom } = require("../realtime");
