@@ -20,7 +20,7 @@ const VALID_TYPES = [
 ];
 
 const touchBoard = (boardId) =>
-  query("UPDAE whiteboards SET updated_at = now() WHERE id = $1", [boardId]);
+  query("UPDATE whiteboards SET updated_at = now() WHERE id = $1", [boardId]);
 
 const createElement = asyncHandler(async (req, res) => {
   const { type } = req.body;
