@@ -13,7 +13,7 @@ const listBoards = asyncHandler(async (req, res) => {
             (b.owner_id = $1) AS is_owner,
             COALESCE(cnt.n, 0)::int AS element_count
         FROM whiteboards b
-        LEFT JOIN whiteboard members m
+        LEFT JOIN whiteboard_members m
           ON m.whiteboard_id = b.id AND m.user_id = $1
         LEFT JOIN (
           SELECT whiteboard_id, COUNT(*) AS n FROM elements GROUP BY whiteboard_id
@@ -56,7 +56,7 @@ const getBoard = asyncHandler(async (req, res) => {
         WHERE b.id = $1
       UNION
       SELECT u.id, u.name, u.email, u.avatar_url, m.role
-        FROM whiteboard members m
+        FROM whiteboard_members m
         JOIN users u ON u.id = m.user_id
         WHERE m.whiteboard_id = $1`,
       [req.board.id],
@@ -134,7 +134,7 @@ const addMember = asyncHandler(async (req, res) => {
   if (invitee.id === req.board.owner_id)
     throw ApiError.badRequest("The owner already has full access");
   await query(
-    `INSERT INTO whiteboard members (whiteboard_id, user_id, role)
+    `INSERT INTO whiteboard_members (whiteboard_id, user_id, role)
     VALUES ($1, $2, $3)
     ON CONFLICT (whiteboard_id, user_id) DO UPDATE SET role = EXCLUDED.role`,
     [req.board.id, invitee.id, role],
@@ -149,7 +149,7 @@ const removeMember = asyncHandler(async (req, res) => {
   if (req.board.role !== "owner")
     throw ApiError.forbidden("Only the owner can manage members ");
   await query(
-    "DELETE FROM whiteboard members WHERE whiteboard_id = $1 AND user_id = $2",
+    "DELETE FROM whiteboard_members WHERE whiteboard_id = $1 AND user_id = $2",
     [req.board.id, req.params.userId],
   );
   emitToBoard(req.board.id, "member:removed", { userId: req.params.userId });
