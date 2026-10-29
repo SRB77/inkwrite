@@ -31,7 +31,7 @@ const requireBoardAccess = asyncHandler(async (req, res, next) => {
   next();
 });
 
-const requiredEditAccess  = (req, _res , next) => {
+const requireEditAccess  = (req, _res , next) => {
     if(!req.board) return next(ApiError.forbidden("Access not resolved"));
 
     if(req.board.role === "viewer"){
@@ -40,4 +40,4 @@ const requiredEditAccess  = (req, _res , next) => {
     next();
 };
 
-module.exports = {requireBoardAccess, requiredEditAccess}
+module.exports = {requireBoardAccess, requireEditAccess}
