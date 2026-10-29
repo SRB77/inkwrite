@@ -4,7 +4,7 @@ const asyncHandler = require("../utils/asyncHandler");
 const { emitToBoard } = require("../realtime");
 const { deleteUploadByUrl } = require("../utils/fileCleanup");
 
-const HEX_RE = /^#[0-9a-fA-F] {6}$/;
+const HEX_RE = /^#[0-9a-fA-F]{6}$/;
 
 const listBoards = asyncHandler(async (req, res) => {
   const { rows } = await query(
