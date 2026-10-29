@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS whiteboards (
     title           TEXT NOT NULL,
     description     TEXT,
     background      TEXT NOT NULL DEFAULT 'dots',
-    bg_color        TEXT NOT NULL DEFAULT '■#ffffff',
+    bg_color        TEXT NOT NULL DEFAULT '#ffffff',
     owner_id        UUID NOT NULL REFERENCES users (id) ON DELETE CASCADE,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
