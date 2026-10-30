@@ -273,3 +273,39 @@ Two-column auth layout: branded left panel (desktop only) + centered form on the
 - `UserMenu.jsx` not yet reviewed
 
 ---
+
+## Bug Fixes (resolved)
+
+### Whiteboard routes crash on startup (`Route.patch() requires a callback`)
+- **Cause:** `whiteboardAccess.js` exported `requiredEditAccess` (typo — extra `d`); routes imported `requireEditAccess` → destructured as `undefined` → Express crashed on `router.patch()`
+- **Fix:** Renamed to `requireEditAccess` in both the declaration and the export
+
+### Additional bugs fixed in the same pass
+- `whiteboardRoutes.js`: duplicate `router.get("/")` for `createBoard` → `router.post("/")`
+- `whiteboardRoutes.js`: `":boardId"` missing leading `/` → `"/:boardId"`
+- `whiteboardController.js`: regex `/^#[0-9a-fA-F] {6}$/` had stray space → `/^#[0-9a-fA-F]{6}$/`
+- `whiteboardController.js`: SQL table name `whiteboard members` (space) → `whiteboard_members` (3 occurrences)
+- `whiteboardController.js` `createBoard`: `query()` called with no args; SQL string and params were floating dead expressions → fixed to proper `query(sql, params)` call
+
+### Socket.IO crash (`Server is not defined`)
+- **Cause:** `src/socket/index.js` imported `{ server }` (lowercase) from `socket.io`; correct export is `Server`
+- **Fix:** `const { Server } = require("socket.io")`
+
+### Upload middleware crash (`cb is not defined`)
+- **Cause:** `src/middleware/upload.js` multer `fileFilter` had third param named `db` instead of `cb`; the body referenced `cb(...)` → `ReferenceError` on every upload
+- **Fix:** Renamed param `db` → `cb`
+
+### `touchBoard` silently broken (element writes don't update board `updated_at`)
+- **Cause:** `src/controllers/elementController.js` SQL had typo `"UPDAE whiteboards..."` — pg would throw on every element create/update/delete
+- **Fix:** `UPDAE` → `UPDATE`
+
+### Schema default bg_color corrupt
+- **Cause:** `src/db/schema.sql` had `DEFAULT '■#ffffff'` — stray `■` character before the hex value; new boards would persist an invalid color
+- **Fix:** Removed the stray character → `DEFAULT '#ffffff'`
+
+### AI and upload routes not mounted *(was already resolved in the codebase)*
+- `whiteboardRoutes.js` already imports and mounts `aiController` (6 routes under `/:boardId/ai/`) and `uploadController` (under `/:boardId/uploads`) — no change needed
+
+### Socket.IO crash (`socket is not defined`)
+- **Cause:** `wb:leave`, `presence:cursor`, `element:live`, `disconnecting` handlers placed outside the `io.on("connection", socket => { ... })` callback — closing `});` was one block too early
+- **Fix:** Moved closing `});` to after `disconnecting` handler, wrapping all per-socket listeners inside the connection callback
