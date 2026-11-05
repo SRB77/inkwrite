@@ -94,7 +94,9 @@ export const uploadApi = {
   image: (boardId, blob, filename = "image.png") => {
     const form = new FormData();
     form.append("image", blob, filename);
-    return pick("url")(api.post(`${board(boardId)}/uploads`, form));
+    return data(api.post(`${board(boardId)}/uploads`, form)).then(
+      ({ url, storageKey }) => ({ url, storageKey }),
+    );
   },
 };
 

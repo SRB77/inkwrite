@@ -481,13 +481,24 @@ export default function WhiteboardPage() {
       const toastId = toast.loading("Uploading image…");
       try {
         const { blob, width, height, type } = await fileToDownscaledBlob(file);
-        const url = await uploadApi.image(boardId, blob, `image.${type === "image/png" ? "png" : "jpg"}`);
+        const { url, storageKey } = await uploadApi.image(
+          boardId,
+          blob,
+          `image.${type === "image/png" ? "png" : "jpg"}`,
+        );
         const scale = Math.min(1, 360 / Math.max(width, height));
         const w = Math.round(width * scale);
         const h = Math.round(height * scale);
         const c = at || viewportCenter();
         checkpoint();
-        const row = await create("image", { x: c.x - w / 2, y: c.y - h / 2, w, h, src: url });
+        const row = await create("image", {
+          x: c.x - w / 2,
+          y: c.y - h / 2,
+          w,
+          h,
+          src: url,
+          storageKey,
+        });
         if (row) setSelectedIds([row.id]);
         toast.success("Image added", { id: toastId });
       } catch (err) {

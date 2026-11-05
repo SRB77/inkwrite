@@ -3,6 +3,7 @@ const ApiError = require("../utils/ApiError");
 const asyncHandler = require("../utils/asyncHandler");
 const { emitToBoard } = require("../realtime");
 const { deleteUploadByUrl } = require("../utils/fileCleanup");
+const storage = require("../config/storage");
 
 const HEX_RE = /^#[0-9a-fA-F]{6}$/;
 
@@ -63,9 +64,36 @@ const getBoard = asyncHandler(async (req, res) => {
       [req.board.id],
     ),
   ]);
+  const elements = await Promise.all(
+    elementsRes.rows.map(async (element) => {
+      if (element.type !== "image" || !storage.isEnabled()) return element;
+
+      const storageKey =
+        element.data?.storageKey || storage.keyFromUrl(element.data?.src);
+      if (!storageKey) return element;
+
+      try {
+        return {
+          ...element,
+          data: {
+            ...element.data,
+            src: await storage.getReadUrl(storageKey),
+            storageKey,
+          },
+        };
+      } catch (error) {
+        console.warn(
+          `Unable to refresh image URL for element ${element.id}`,
+          error,
+        );
+        return element;
+      }
+    }),
+  );
+
   res.json({
     board: { ...boardRes.rows[0], role: req.board.role },
-    elements: elementsRes.rows,
+    elements,
     members: membersRes.rows,
   });
 });

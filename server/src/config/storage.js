@@ -2,7 +2,9 @@ const {
   S3Client,
   PutObjectCommand,
   DeleteObjectCommand,
+  GetObjectCommand,
 } = require("@aws-sdk/client-s3");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 
 const cfg = {
   endpoint: process.env.NEON_STORAGE_ENDPOINT,
@@ -44,9 +46,19 @@ const putObject = async (key, buffer, contentType) => {
       Key: key,
       Body: buffer,
       ContentType: contentType,
+      CacheControl: "public, max-age=3600",
     }),
   );
   return `${cfg.endpoint.replace(/\/$/, "")}/${cfg.bucket}/${key}`;
+};
+
+const getReadUrl = async (key, expiresIn = 3600) => {
+  if (!enabled || !key) return null;
+  return getSignedUrl(
+    client,
+    new GetObjectCommand({ Bucket: cfg.bucket, Key: key }),
+    { expiresIn },
+  );
 };
 
 const deleteObject = async (key) => {
@@ -62,6 +74,7 @@ const keyFromUrl = (url) => {
 module.exports = {
   isEnabled,
   putObject,
+  getReadUrl,
   deleteObject,
   keyFromUrl,
   bucket: cfg.bucket,

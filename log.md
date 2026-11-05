@@ -346,3 +346,10 @@ Two-column auth layout: branded left panel (desktop only) + centered form on the
 - Updated `client/src/App.jsx` with centralized typed toast styling, red alert errors, alert icons, one-click immediate dismissal, and short error durations.
 - Updated `client/src/components/DemoAccessButton.jsx` with a high-contrast black button, white text, rounded form-aligned styling, and stronger visual weight.
 - Updated demo-only restricted actions to use error toasts so they receive the same warning treatment.
+
+## Image upload rendering fix — November 6, 2026
+
+- Fixed uploaded images rendering as a broken/placeholder image when Neon Object Storage is configured with private bucket access.
+- The upload controller now persists the S3 object key, returns a short-lived signed GET URL for the first render, and leaves local disk uploads unchanged.
+- Board reads refresh signed URLs from the persisted object key (and derive keys for older image rows) before returning image elements, so reopening a board does not reuse an expired URL.
+- Added the AWS S3 request-presigner dependency and documented the signed-read storage behavior in `README.md`.
