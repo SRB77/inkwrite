@@ -22,7 +22,9 @@
 
 ## Config
 
-- `src/config/neonAuth.js` — verifies JWT / session token via Neon Auth JWKS
+- `src/config/neonAuth.js` — verifies Neon Auth JWT/session tokens when configured, otherwise verifies and signs local HS256 JWTs using `JWT_SECRET`
+- `src/controllers/authController.js` — local-mode registration/login with scrypt password hashes and JWT session responses
+- `src/routes/authRoutes.js` — local auth endpoints plus protected session restore endpoint
 - `src/config/storage.js` — Neon Object Storage (S3-compatible): `putObject`, `deleteObject`, `keyFromUrl`; gracefully disabled when env vars are absent
 - `src/config/uploads.js` — resolves local `uploads/` directory, creates it on startup (`UPLOAD_DIR`)
 
@@ -43,7 +45,8 @@
 
 ## Routes
 
-- `src/routes/index.js` — root `/api` router; mounts `/healthcheck`, `/users`, `/whiteboards`
+- `src/routes/index.js` — root `/api` router; mounts `/healthcheck`, `/auth`, `/users`, `/whiteboards`
+- `src/routes/authRoutes.js` — `POST /auth/register`, `POST /auth/login` for local mode and protected `GET /auth/me`
 - `src/routes/userRoutes.js` — `GET /users/search` (protected)
 - `src/routes/whiteboardRoutes.js` — full board CRUD + member management + element CRUD (all protected by `requireAuth`):
   - `GET /whiteboards` — list boards
@@ -251,7 +254,7 @@ Two-column auth layout: branded left panel (desktop only) + centered form on the
 | `Register.jsx` | ✅ Done (not read) | Mirrors Login |
 | `Dashboard.jsx` | ✅ Done | Board grid with `BoardThumbnail`, `CreateBoardModal`, delete with confirm |
 | `NotFound.jsx` | ✅ Done (not read) | 404 page |
-| `WhiteboardPage.jsx` | 🚧 Stub | Returns `<div>Whiteboard</div>` — Canvas, AIPanel, ShareModal, toolbar not wired up yet |
+| `WhiteboardPage.jsx` | ✅ Done | Full protected editor with Canvas, TopBar, Toolbar, StylePanel, AIPanel, ShareModal, realtime presence, uploads, exports, charts, and undo/redo |
 
 ---
 
@@ -267,10 +270,7 @@ Two-column auth layout: branded left panel (desktop only) + centered form on the
 - Export to SVG + PNG
 
 **Remaining:**
-- `WhiteboardPage.jsx` needs to be built — wire up Canvas + AIPanel + ShareModal + toolbar + Socket.IO presence + undo/redo
-- `ChartElement.jsx` and `ChartEditor.jsx` not yet reviewed
-- `EditingOverlay.jsx` not yet reviewed
-- `UserMenu.jsx` not yet reviewed
+- No known feature wiring remains from the original implementation log. Future work is product enhancement rather than completing the editor shell.
 
 ---
 
@@ -309,3 +309,28 @@ Two-column auth layout: branded left panel (desktop only) + centered form on the
 ### Socket.IO crash (`socket is not defined`)
 - **Cause:** `wb:leave`, `presence:cursor`, `element:live`, `disconnecting` handlers placed outside the `io.on("connection", socket => { ... })` callback — closing `});` was one block too early
 - **Fix:** Moved closing `});` to after `disconnecting` handler, wrapping all per-socket listeners inside the connection callback
+
+### Authentication mode mismatch and stale test route
+- **Cause:** The client exposed local JWT calls (`/auth/register`, `/auth/login`, `/auth/me`) but the server did not mount those routes, while token verification only handled Neon Auth. `userRoutes.js` also contained an unrelated `/users/about` test endpoint.
+- **Fix:** Added `src/controllers/authController.js` and `src/routes/authRoutes.js`; mounted `/api/auth`; implemented scrypt password hashing, local HS256 JWT issue/verify, login, registration, and session restore; added the idempotent `users.password_hash` schema migration; removed `/users/about`.
+
+### Neon Auth configuration warning and documentation drift
+- **Cause:** `neonAuth.js` logged that Neon Auth was missing when it was actually configured, and `log.md` described the now-complete `WhiteboardPage.jsx` as a stub.
+- **Fix:** Corrected the configuration branch and synchronized `log.md` and `README.md` with the current editor and authentication behavior.
+
+## Consistency pass — November 5, 2026
+
+- Added working local JWT fallback without changing the Neon Auth production path.
+- Added `JWT_SECRET` to `server/.env.example` and the setup documentation.
+- Mounted the missing auth routes and removed the stray user test endpoint.
+- Added an idempotent `password_hash` column migration for existing databases.
+- Updated the API table, current-page status, architecture notes, and remaining-work section to match the source tree.
+
+## Demo workspace — November 5, 2026
+
+- Added `client/src/components/DemoAccessButton.jsx` — shared CTA on sign-in and sign-up screens that opens a fresh `/demo?session=...` route.
+- Added `client/src/components/board/DemoBanner.jsx` — explains that demo work is temporary and links visitors to sign in.
+- Added `client/src/pages/DemoWhiteboardPage.jsx` — client-only whiteboard with local element state, drawing tools, shapes, text, sticky notes, emoji, undo/redo, zoom, and PNG export.
+- Updated `client/src/App.jsx` — added the public `/demo` route.
+- Updated local and Neon Auth screens — added the demo CTA without changing authentication behavior.
+- Demo mode intentionally does not call board APIs, open Socket.IO rooms, create database rows, or persist data in localStorage.
