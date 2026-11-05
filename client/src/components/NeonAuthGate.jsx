@@ -2,6 +2,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { NeonAuthUIProvider, AuthView } from "@neondatabase/auth-ui";
 import { authClient, neonEnabled } from "../lib/neonAuth";
 import AuthLayout from "./AuthLayout";
+import DemoAccessButton from "./DemoAccessButton";
 
 // Module-level so its identity is stable across renders.
 const RouterLink = ({ href, ...props }) => <Link to={href} {...props} />;
@@ -32,6 +33,7 @@ export function NeonAuthPage() {
   return (
     <AuthLayout wide>
       <AuthView path={pathname} />
+      {(pathname === "sign-in" || pathname === "sign-up") && <DemoAccessButton className="mt-4 w-full" />}
     </AuthLayout>
   );
 }
