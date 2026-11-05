@@ -5,6 +5,7 @@ import AuthLayout from "../components/AuthLayout";
 import Button from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { useAuth } from "../context/AuthContext";
+import DemoAccessButton from "../components/DemoAccessButton";
 
 export default function Register() {
   const { register } = useAuth();
@@ -55,6 +56,7 @@ export default function Register() {
         <Button type="submit" loading={loading} className="w-full">
           Create account
         </Button>
+        <DemoAccessButton className="w-full" />
       </form>
     </AuthLayout>
   );
