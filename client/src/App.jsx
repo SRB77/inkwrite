@@ -9,6 +9,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import WhiteboardPage from "./pages/WhiteboardPage";
+import DemoWhiteboardPage from "./pages/DemoWhiteboardPage";
 import NotFound from "./pages/NotFound";
 
 const toastOptions = {
@@ -31,6 +32,7 @@ export default function App() {
         <AuthProvider>
           <Routes>
             <Route path="/" element={<Landing />} />
+            <Route path="/demo" element={<DemoWhiteboardPage />} />
 
             {neonEnabled ? (
               <>
