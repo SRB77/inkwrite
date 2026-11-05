@@ -335,6 +335,9 @@ DATABASE_URL=postgresql://user:password@localhost:5432/inkwrite?sslmode=require
 # Neon Auth (Optional - leave empty for standalone local JWT mode)
 NEON_AUTH_URL=
 
+# Local JWT fallback (required when NEON_AUTH_URL is empty in deployed environments)
+JWT_SECRET=replace-with-a-long-random-secret
+
 # Neon Object Storage / S3 (Optional - falls back to local /uploads directory)
 NEON_STORAGE_ENDPOINT=
 NEON_STORAGE_ACCESS_KEY_ID=
@@ -397,7 +400,10 @@ npm run dev
 
 | Method | Endpoint | Access | Description |
 |---|---|---|---|
-| `GET` | `/api/healthcheck` | Public | System status and database connectivity |
+| `GET` | `/api/healthcheck` | Public | API process health status |
+| `POST` | `/api/auth/register` | Public (local mode) | Create a local JWT account |
+| `POST` | `/api/auth/login` | Public (local mode) | Sign in with local JWT credentials |
+| `GET` | `/api/auth/me` | Protected | Restore the current local-auth session |
 | `GET` | `/api/users/search?q=...` | Protected | Search users by name or email |
 | `GET` | `/api/whiteboards` | Protected | List whiteboards accessible to current user |
 | `POST` | `/api/whiteboards` | Protected | Create a new whiteboard |
@@ -461,6 +467,14 @@ Server ──► Client
 - [ ] Export to interactive HTML and printable multi-page PDF documents
 - [ ] Yjs / Automerge CRDT integration for offline-first conflict-free p2p editing
 - [ ] Audio/Video collaboration rooms with WebRTC mesh calling
+
+### Implementation consistency notes
+
+- `WhiteboardPage.jsx` is fully implemented and is the protected editor route; older development notes describing it as a stub are historical and have been corrected in `log.md`.
+- When `NEON_AUTH_URL` is configured, Neon Auth is used for sign-in and token verification.
+- When `NEON_AUTH_URL` is empty, `/api/auth/register`, `/api/auth/login`, and `/api/auth/me` provide the standalone local JWT fallback. Set a strong `JWT_SECRET` outside development.
+- The local fallback stores scrypt password hashes in `users.password_hash`; existing databases receive this column through the idempotent schema migration.
+- `/demo` provides a client-only guest canvas for recruiters and first-time visitors. Demo changes are temporary and do not use database persistence, Socket.IO, AI, sharing, or uploads.
 
 ---
 
