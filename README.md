@@ -57,7 +57,7 @@ Built from first principles, InkWrite features an in-house SVG rendering pipelin
 
 ### 🛡️ Enterprise Security & Storage
 * **Dual Auth Runtime:** Seamless switching between Neon Auth (JWKS session tokens) and standalone JWT with automatic 401 retry loops.
-* **Cloud & Edge Storage:** S3-compatible Neon Object Storage client with automated fallback to localized disk storage (`/uploads`).
+* **Cloud & Edge Storage:** S3-compatible Neon Object Storage client with refreshed signed browser read URLs and automated fallback to localized disk storage (`/uploads`).
 * **Clean Garbage Collection:** Cascading deletion hooks remove cloud and disk image assets whenever element entities are destroyed.
 
 ---
