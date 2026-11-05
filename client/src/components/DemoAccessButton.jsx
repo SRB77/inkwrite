@@ -9,7 +9,12 @@ function demoHref() {
 
 export default function DemoAccessButton({ className }) {
   return (
-    <Button as={Link} to={demoHref()} variant="soft" className={className}>
+    <Button
+      as={Link}
+      to={demoHref()}
+      variant="outline"
+      className={`!flex rounded-xl !border-[#16161d] !bg-[#16161d] font-bold !text-white shadow-[var(--shadow-card)] hover:!border-black hover:!bg-black ${className || ""}`}
+    >
       <Sparkles className="h-4 w-4" />
       Try as a Demo User
     </Button>

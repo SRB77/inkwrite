@@ -1,0 +1,7 @@
+{
+  "name": "inkwrite",
+  "private": true,
+  "scripts": {
+    "start": "node scripts/start.js"
+  }
+}

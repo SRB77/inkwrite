@@ -389,6 +389,16 @@ npm run dev
 # Frontend running on http://localhost:5173
 ```
 
+### Start both client and server together
+
+From the repository root, run:
+
+```bash
+npm run start
+```
+
+This starts the backend development server on `http://localhost:5050` and the Vite frontend on `http://localhost:5173`. If either port is already in use by an InkWrite process, the launcher reuses that running service instead of starting a duplicate. Press `Ctrl+C` once to stop processes started by the launcher.
+
 > [!TIP]
 > Open `http://localhost:5173` in your browser. Open a secondary incognito window to test live multi-user cursors and instant collaborative edits in real time!
 

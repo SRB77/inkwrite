@@ -32,8 +32,10 @@ export function NeonAuthPage() {
   const { pathname } = useParams();
   return (
     <AuthLayout wide>
-      <AuthView path={pathname} />
-      {(pathname === "sign-in" || pathname === "sign-up") && <DemoAccessButton className="mt-4 w-full" />}
+      <div className="flex w-full flex-col items-center">
+        <AuthView path={pathname} />
+        {(pathname === "sign-in" || pathname === "sign-up") && <DemoAccessButton className="mt-4 w-full max-w-sm" />}
+      </div>
     </AuthLayout>
   );
 }

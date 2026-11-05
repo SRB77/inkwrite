@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { Toaster } from "react-hot-toast";
+import { Toaster, toast } from "react-hot-toast";
+import { AlertTriangle, CheckCircle2, Info, Loader2, X } from "lucide-react";
 import { AuthProvider } from "./context/AuthContext";
 import { neonEnabled } from "./lib/neonAuth";
 import NeonAuthGate, { NeonAuthPage } from "./components/NeonAuthGate";
@@ -11,19 +12,6 @@ import Dashboard from "./pages/Dashboard";
 import WhiteboardPage from "./pages/WhiteboardPage";
 import DemoWhiteboardPage from "./pages/DemoWhiteboardPage";
 import NotFound from "./pages/NotFound";
-
-const toastOptions = {
-  style: {
-    background: "#fff",
-    color: "#16161d",
-    border: "1px solid #e9e8f3",
-    borderRadius: "999px",
-    padding: ".6rem 1rem",
-    boxShadow: "0 8px 24px rgba(28,27,64,.08), 0 2px 6px rgba(28,27,64,.04)",
-    fontSize: ".875rem",
-    fontWeight: 500,
-  },
-};
 
 export default function App() {
   return (
@@ -91,7 +79,48 @@ export default function App() {
           </Routes>
         </AuthProvider>
       </NeonAuthGate>
-      <Toaster position="bottom-center" toastOptions={toastOptions} />
+      <Toaster
+        position="bottom-center"
+        gutter={10}
+        toastOptions={{
+          error: { duration: 500 },
+          success: { duration: 1500 },
+          blank: { duration: 1000 },
+          loading: { duration: Infinity },
+        }}
+      >
+        {(t) => {
+          const isError = t.type === "error";
+          const isSuccess = t.type === "success";
+          const Icon = isError ? AlertTriangle : isSuccess ? CheckCircle2 : t.type === "loading" ? Loader2 : Info;
+          const tone = isError
+            ? "border-red-200 bg-red-50 text-red-800"
+            : isSuccess
+              ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+              : "border-line bg-white text-ink";
+          return (
+            <div
+              role={isError ? "alert" : "status"}
+              className={`flex max-w-[min(92vw,28rem)] items-center gap-3 rounded-2xl border px-3.5 py-3 text-sm font-medium shadow-[var(--shadow-lift)] ${tone}`}
+            >
+              <Icon className={`h-4.5 w-4.5 shrink-0 ${t.type === "loading" ? "animate-spin" : ""}`} />
+              <span className="min-w-0 flex-1">{t.message}</span>
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  toast.remove(t.id);
+                }}
+                aria-label="Dismiss notification"
+                className="focus-ring -mr-1 grid h-6 w-6 shrink-0 place-items-center rounded-full opacity-70 transition-opacity hover:bg-black/5 hover:opacity-100"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          );
+        }}
+      </Toaster>
     </BrowserRouter>
   );
 }

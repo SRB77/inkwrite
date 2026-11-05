@@ -169,8 +169,8 @@ export default function DemoWhiteboardPage() {
       <Toolbar
         tool={tool}
         setTool={setTool}
-        onImage={() => toast("Sign in to add images to saved boards")}
-        onChart={() => toast("Sign in to use AI charts on saved boards")}
+        onImage={() => toast.error("Sign in to add images to saved boards")}
+        onChart={() => toast.error("Sign in to use AI charts on saved boards")}
         emojiOpen={emojiOpen}
         onEmojiToggle={() => setEmojiOpen((open) => !open)}
       />

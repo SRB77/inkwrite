@@ -334,3 +334,15 @@ Two-column auth layout: branded left panel (desktop only) + centered form on the
 - Updated `client/src/App.jsx` — added the public `/demo` route.
 - Updated local and Neon Auth screens — added the demo CTA without changing authentication behavior.
 - Demo mode intentionally does not call board APIs, open Socket.IO rooms, create database rows, or persist data in localStorage.
+
+## Root start command — November 5, 2026
+
+- Added root `package.json` with `npm run start`.
+- Added `scripts/start.js`, a dependency-free process launcher that starts `server` and `client` development scripts together and forwards shutdown signals to both processes.
+- Updated `scripts/start.js` to check ports `5050` and `5173` first, avoiding duplicate-process `EADDRINUSE` failures when either service is already running.
+
+## Notification and demo CTA polish — November 5, 2026
+
+- Updated `client/src/App.jsx` with centralized typed toast styling, red alert errors, alert icons, one-click immediate dismissal, and short error durations.
+- Updated `client/src/components/DemoAccessButton.jsx` with a high-contrast black button, white text, rounded form-aligned styling, and stronger visual weight.
+- Updated demo-only restricted actions to use error toasts so they receive the same warning treatment.
