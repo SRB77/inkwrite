@@ -5,6 +5,7 @@ import AuthLayout from "../components/AuthLayout";
 import Button from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { useAuth } from "../context/AuthContext";
+import DemoAccessButton from "../components/DemoAccessButton";
 
 export default function Login() {
   const { login } = useAuth();
@@ -54,6 +55,7 @@ export default function Login() {
         <Button type="submit" loading={loading} className="w-full">
           Sign in
         </Button>
+        <DemoAccessButton className="w-full" />
       </form>
     </AuthLayout>
   );
