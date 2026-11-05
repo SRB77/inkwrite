@@ -5,8 +5,11 @@ CREATE TABLE IF NOT EXISTS users (
     name            TEXT NOT NULL,
     email           TEXT NOT NULL UNIQUE,
     avatar_url      TEXT,
+    password_hash   TEXT,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash TEXT;
 
 CREATE TABLE IF NOT EXISTS whiteboards (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid (),
